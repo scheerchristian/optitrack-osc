@@ -7,7 +7,7 @@ A program that reads OptiTrack rigid body data from Motive 2.3.0 via NatNet and 
 ### Phase 1 — NatNet receiver
 - Connect to Motive 2.3.0 using the NatNet SDK (or a compatible Python client such as `natnetclient` / direct UDP parsing)
 - Subscribe to rigid body frame data
-- Extract per-rigid-body position (x, y, z) and quaternion orientation, convert to Euler angles (yaw, pitch, roll)
+- Extract per-rigid-body position (x, y, z) and quaternion orientation, convert to angles in degree (yaw, pitch, roll)
 
 ### Phase 2 — OSC sender
 - Use `python-osc` to build and send OSC messages
