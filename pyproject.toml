@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "optitrack-osc"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "python-osc>=1.8.0",
+]
+
+[project.scripts]
+optitrack-osc = "optitrack_osc.__main__:main"
