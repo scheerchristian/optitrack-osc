@@ -25,8 +25,8 @@ Orientation uses **ZYX Tait-Bryan** convention (yaw = rotation around Z, pitch =
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/OptitrackOSC.git
-cd OptitrackOSC
+git clone https://github.com/scheerchristian/optitrack-osc.git
+cd optitrack-osc
 ```
 
 ### 2. Create a Conda environment
