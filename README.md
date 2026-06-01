@@ -5,11 +5,13 @@ Reads rigid body data from a **Motive 2.3.0** OptiTrack stream (NatNet 4.0) and 
 Each tracked rigid body produces two OSC messages per frame:
 
 ```
-/optitrack/<name>/position   float x  float y  float z        (metres)
-/optitrack/<name>/rotation   float yaw  float pitch  float roll (degrees)
+/optitrack/<name>/position   float x  float y  float z               (metres)
+/optitrack/<name>/rotation   float yaw  float pitch  float roll       (degrees, default)
+                         — or —
+/optitrack/<name>/rotation   float w  float x  float y  float z      (quaternion)
 ```
 
-Orientation uses **ZYX Tait-Bryan** convention (yaw = rotation around Z, pitch = Y, roll = X).
+The rotation format is selectable at startup (see `--rotation-format` below). The default is Euler angles using the **ZYX Tait-Bryan** convention (yaw = rotation around Z, pitch = Y, roll = X).
 
 ---
 
@@ -82,16 +84,23 @@ optitrack-osc --server-ip 192.168.1.10
 optitrack-osc --server-ip 192.168.1.10 --osc-host 192.168.1.20 --osc-port 8000
 ```
 
+### Send quaternions instead of Euler angles
+
+```bash
+optitrack-osc --rotation-format quaternion
+```
+
 ### All options
 
 ```
 optitrack-osc --help
 
-  --server-ip  IP    Motive machine IP address          (default: 127.0.0.1)
-  --local-ip   IP    Local network interface for multicast (default: 0.0.0.0)
-  --osc-host   IP    OSC target host                    (default: 127.0.0.1)
-  --osc-port   PORT  OSC target port                    (default: 9000)
-  -v, --verbose      Enable debug logging
+  --server-ip       IP      Motive machine IP address             (default: 127.0.0.1)
+  --local-ip        IP      Local network interface for multicast  (default: 0.0.0.0)
+  --osc-host        IP      OSC target host                       (default: 127.0.0.1)
+  --osc-port        PORT    OSC target port                       (default: 9000)
+  --rotation-format FORMAT  euler or quaternion                   (default: euler)
+  -v, --verbose             Enable debug logging
 ```
 
 ### Verbose mode (shows every frame in the terminal)
@@ -107,7 +116,8 @@ optitrack-osc --server-ip 192.168.1.10 -v
 | Address | Arguments | Notes |
 |---|---|---|
 | `/optitrack/<name>/position` | `x y z` (float, metres) | World-space position |
-| `/optitrack/<name>/rotation` | `yaw pitch roll` (float, degrees) | ZYX Tait-Bryan Euler angles |
+| `/optitrack/<name>/rotation` | `yaw pitch roll` (float, degrees) | ZYX Tait-Bryan Euler angles (`--rotation-format euler`, default) |
+| `/optitrack/<name>/rotation` | `w x y z` (float) | Unit quaternion (`--rotation-format quaternion`) |
 
 `<name>` is the rigid body name set in Motive. Spaces and special characters are replaced with underscores.
 

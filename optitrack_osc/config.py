@@ -24,6 +24,11 @@ def parse_args() -> argparse.Namespace:
         help="OSC target port (default: 9000)",
     )
     p.add_argument(
+        "--rotation-format", choices=["euler", "quaternion"], default="euler",
+        metavar="FORMAT",
+        help="Rotation format to send via OSC: 'euler' (yaw/pitch/roll in degrees, default) or 'quaternion' (w,x,y,z)",
+    )
+    p.add_argument(
         "-v", "--verbose", action="store_true",
         help="Enable debug logging",
     )

@@ -30,6 +30,10 @@ class RigidBody:
     yaw: float          # degrees, rotation around Z
     pitch: float        # degrees, rotation around Y
     roll: float         # degrees, rotation around X
+    qw: float
+    qx: float
+    qy: float
+    qz: float
     tracking_valid: bool
 
 
@@ -214,6 +218,7 @@ class NatNetClient:
                 name=self._names.get(rb_id, str(rb_id)),
                 x=x, y=y, z=z,
                 yaw=yaw, pitch=pitch, roll=roll,
+                qw=qw, qx=qx, qy=qy, qz=qz,
                 tracking_valid=bool(params & 0x01),
             ))
 

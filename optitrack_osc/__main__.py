@@ -15,7 +15,7 @@ def main():
         format="%(levelname)s %(name)s: %(message)s",
     )
 
-    sender = OscSender(args.osc_host, args.osc_port)
+    sender = OscSender(args.osc_host, args.osc_port, rotation_format=args.rotation_format)
     client = NatNetClient(
         server_ip=args.server_ip,
         local_ip=args.local_ip,
@@ -23,7 +23,7 @@ def main():
     )
 
     print(f"Connecting to Motive at {args.server_ip} (NatNet multicast)")
-    print(f"Forwarding OSC → {args.osc_host}:{args.osc_port}")
+    print(f"Forwarding OSC → {args.osc_host}:{args.osc_port}  rotation-format={args.rotation_format}")
     print("Press Ctrl-C to quit.\n")
 
     client.start()
