@@ -27,9 +27,9 @@ class RigidBody:
     x: float
     y: float
     z: float
-    yaw: float          # degrees, rotation around Z
-    pitch: float        # degrees, rotation around Y
-    roll: float         # degrees, rotation around X
+    yaw: float          # degrees, rotation around Y
+    pitch: float        # degrees, rotation around X
+    roll: float         # degrees, rotation around Z
     qw: float
     qx: float
     qy: float
@@ -38,16 +38,22 @@ class RigidBody:
 
 
 def _quat_to_euler_deg(qx: float, qy: float, qz: float, qw: float):
-    """Convert quaternion to ZYX Tait-Bryan Euler angles in degrees."""
-    roll = math.degrees(math.atan2(
-        2.0 * (qw * qx + qy * qz),
-        1.0 - 2.0 * (qx * qx + qy * qy),
-    ))
-    sinp = max(-1.0, min(1.0, 2.0 * (qw * qy - qz * qx)))
+    """Convert quaternion to YXZ Tait-Bryan Euler angles in degrees.
+
+    Requires Motive Y-up coordinate system.
+      yaw   = rotation around Y (horizontal heading)
+      pitch = rotation around X (forward/backward tilt)
+      roll  = rotation around Z (sideways lean)
+    """
+    sinp = max(-1.0, min(1.0, 2.0 * (qw * qx - qy * qz)))
     pitch = math.degrees(math.asin(sinp))
     yaw = math.degrees(math.atan2(
-        2.0 * (qw * qz + qx * qy),
-        1.0 - 2.0 * (qy * qy + qz * qz),
+        2.0 * (qx * qz + qw * qy),
+        1.0 - 2.0 * (qx * qx + qy * qy),
+    ))
+    roll = math.degrees(math.atan2(
+        2.0 * (qx * qy + qw * qz),
+        1.0 - 2.0 * (qx * qx + qz * qz),
     ))
     return yaw, pitch, roll
 
@@ -78,7 +84,6 @@ class NatNetClient:
         self._running = True
         self._cmd_sock = self._open_command_socket()
         self._data_sock = self._open_data_socket()
-        # Announce ourselves and request rigid body name map
         self._send(_NAT_CONNECT, b"\x04\x00\x00\x00\x04\x00\x00\x00")
         self._send(_NAT_REQUEST_MODELDEF)
         threading.Thread(target=self._recv_loop, args=(self._cmd_sock,), daemon=True).start()
@@ -155,7 +160,7 @@ class NatNetClient:
                 _, offset = _read_str(data, offset)
                 m, = struct.unpack_from("<i", data, offset)
                 offset += 4
-                for __ in range(m):     # marker names
+                for __ in range(m):
                     _, offset = _read_str(data, offset)
             elif asset_type == 1:       # RigidBody
                 name, offset = _read_str(data, offset)
@@ -167,19 +172,19 @@ class NatNetClient:
                 offset += m * 16        # position(12) + active_label(4) per marker
                 self._names[rb_id] = name
                 log.info("Registered rigid body %d = %r", rb_id, name)
-            elif asset_type == 2:       # Skeleton — parse bones as rigid body defs
+            elif asset_type == 2:       # Skeleton
                 _, offset = _read_str(data, offset)
-                offset += 4             # skeleton id
+                offset += 4
                 bones, = struct.unpack_from("<i", data, offset)
                 offset += 4
                 for __ in range(bones):
                     _, offset = _read_str(data, offset)
-                    offset += 4 + 16    # id + parent_id + offset_xyz
+                    offset += 4 + 16
                     m, = struct.unpack_from("<i", data, offset)
                     offset += 4
                     offset += m * 16
             else:
-                break                   # unknown type; stop safely
+                break
 
     # ── frame data ────────────────────────────────────────────────────────────
 

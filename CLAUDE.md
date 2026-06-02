@@ -35,7 +35,7 @@ A program that reads OptiTrack rigid body data from Motive 2.3.0 via NatNet and 
 - Default data port: 1511
 - Protocol version: NatNet 4.0 (Motive 2.3)
 - Rigid body data includes position as (x, y, z) in meters and orientation as quaternion (qx, qy, qz, qw)
-- Euler conversion order: ZYX (yaw = Z, pitch = Y, roll = X) using scipy or manual quaternion math
+- Euler conversion order: YXZ (yaw = Y, pitch = X, roll = Z) — matches OptiTrack's Y-up coordinate system
 
 ## File Structure (planned)
 ```

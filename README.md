@@ -11,7 +11,7 @@ Each tracked rigid body produces two OSC messages per frame:
 /optitrack/<name>/rotation   float w  float x  float y  float z      (quaternion)
 ```
 
-The rotation format is selectable at startup (see `--rotation-format` below). The default is Euler angles using the **ZYX Tait-Bryan** convention (yaw = rotation around Z, pitch = Y, roll = X).
+The rotation format is selectable at startup (see `--rotation-format` below). The default is Euler angles using the **YXZ Tait-Bryan** convention (yaw = rotation around Y, pitch = X, roll = Z), which matches Motive's Y-up coordinate system.
 
 ---
 
@@ -116,10 +116,69 @@ optitrack-osc --server-ip 192.168.1.10 -v
 | Address | Arguments | Notes |
 |---|---|---|
 | `/optitrack/<name>/position` | `x y z` (float, metres) | World-space position |
-| `/optitrack/<name>/rotation` | `yaw pitch roll` (float, degrees) | ZYX Tait-Bryan Euler angles (`--rotation-format euler`, default) |
+| `/optitrack/<name>/rotation` | `yaw pitch roll` (float, degrees) | YXZ Tait-Bryan Euler angles (`--rotation-format euler`, default) |
 | `/optitrack/<name>/rotation` | `w x y z` (float) | Unit quaternion (`--rotation-format quaternion`) |
 
 `<name>` is the rigid body name set in Motive. Spaces and special characters are replaced with underscores.
+
+---
+
+## Measurement workflow
+
+### Motive setup (do once per session)
+
+1. Make sure **Edit → Settings → Streaming → Up Axis** is set to **Y Up**.
+2. Place the passive tracker flat on a table in its intended neutral orientation, fully visible to the cameras.
+3. In the **Assets** pane, right-click the rigid body → **Reset Pivot**. This makes the current pose the zero reference (identity quaternion). Name the rigid body **head** if you are using benchmark-headtracker.
+4. Confirm tracking is stable (solid marker colours, low mean error).
+
+### Start optitrack-osc
+
+```bash
+conda activate optitrack-osc
+optitrack-osc
+```
+
+No further calibration is needed in this app — Motive's Reset Pivot defines the zero.
+
+---
+
+### Optional: benchmark with benchmark-headtracker
+
+[benchmark-headtracker](https://github.com/scheerchristian/benchmark-headtracker) compares the OptiTrack stream against a webcam-based head tracker across four scenarios: stable grid positions, trajectory following, drift, and latency.
+
+#### One-time configuration
+
+Open `head_tracker_benchmark.py` and confirm the constants at the top match your setup:
+
+```python
+OPTITRACK_PORT = 8001
+OPTITRACK_ADDR = "/optitrack/head/rotation"   # must end in /rotation, not /quaternion
+
+WEBCAM_PORT = 8000
+WEBCAM_ADDR = "/Virtuoso/quat"                # address sent by your webcam tracker
+```
+
+#### Per-session steps
+
+1. Start optitrack-osc in **quaternion** mode, targeting the benchmark port:
+
+   ```bash
+   optitrack-osc --osc-port 8001 --rotation-format quaternion
+   ```
+
+2. Start your webcam head tracker and make sure it is sending OSC to port `8000`.
+
+3. Start the benchmark:
+
+   ```bash
+   conda activate benchmark-headtracker   # or whichever env has the dependencies
+   python head_tracker_benchmark.py
+   ```
+
+4. The benchmark waits 2 seconds for both OSC streams to appear, then reports whether each source is live. Calibrate inside the benchmark when prompted — OptiTrack's pivot reset already defines the mechanical zero, so the benchmark calibration only aligns the two trackers' coordinate frames against each other.
+
+5. Follow the on-screen guidance for each measurement mode. Results are saved to `benchmark_data/<timestamp>/`.
 
 ---
 
