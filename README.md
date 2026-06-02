@@ -1,4 +1,4 @@
-# OptitrackOSC
+# optitrack-osc
 
 Reads rigid body data from a **Motive 2.3.0** OptiTrack stream (NatNet 4.0) and forwards position and orientation as OSC messages to any host and port you choose.
 
