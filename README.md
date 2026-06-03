@@ -50,10 +50,10 @@ This installs `python-osc` and registers the `optitrack-osc` command inside the 
 
 ## Motive setup
 
-1. Open Motive 2.3.0 and go to **Edit → Settings → Streaming**.
+1. Open Motive 2.3.0 and go to **View → Data Streaming Pane**.
 2. Make sure **Broadcast Frame Data** is checked.
 3. Set **Local Interface** to the network adapter that connects to the machine running OptitrackOSC.
-4. Leave the default multicast address (`239.255.42.99`) and ports (command `1510`, data `1511`) unchanged unless you have a reason to change them.
+4. Leave everything else as default.
 5. Create one or more **Rigid Body** assets in Motive. Their names will appear in the OSC address path.
 
 ---
@@ -96,7 +96,7 @@ optitrack-osc --rotation-format quaternion
 optitrack-osc --help
 
   --server-ip       IP      Motive machine IP address             (default: 127.0.0.1)
-  --local-ip        IP      Local network interface for multicast  (default: 0.0.0.0)
+  --local-ip        IP      Local network interface for multicast (default: 0.0.0.0)
   --osc-host        IP      OSC target host                       (default: 127.0.0.1)
   --osc-port        PORT    OSC target port                       (default: 9000)
   --rotation-format FORMAT  euler or quaternion                   (default: euler)
